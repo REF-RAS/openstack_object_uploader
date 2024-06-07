@@ -1,0 +1,22 @@
+# YAML file for google drive uploader
+---
+# Operation Mode
+uploader.mode: web # web or headless
+# cloud name, as appeared in the clouds.yaml file
+uploader.filestore.cloud: openstack
+# filestore path
+uploader.filestore.local: /home/qcr/Insync/Bagfiles
+uploader.filestore.cloud.container: Shorts Bagfiles
+# Upload delay
+uploader.delay: 30 # seconds
+uploader.error_count.max: 5 
+# Dash Agent (uploader) setting
+uploader.web.host: 0.0.0.0
+uploader.web.port: 8071
+# uploader.web.debug.mode: False
+uploader.web.launch_browser: False
+uploader.web.auth: True   # Authentication required if web mode
+# Main system timers for the uploader implemented by Dash
+uploader.system.timer: 1  # seconds
+uploader.console.refresh: 5  # seconds
+
