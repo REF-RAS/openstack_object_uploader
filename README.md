@@ -77,9 +77,10 @@ Determines whether the uploader provides a web interface (`web`) or no interface
 ```yaml
 # cloud name, as appeared in the clouds.yaml file
 uploader.filestore.cloud: openstack
-# filestore path
+# the local filestore path where new or modified files are uploaded
 uploader.filestore.local: /home/qcr/Bagfiles
-uploader.filestore.cloud.container: Bagfiles
+# the target object store container, the uploader will attempt to create if it not already exists
+uploader.filestore.cloud.container: Shorts Bagfiles      
 ```
 The cloud name specified in the `clouds.yaml` should be set against `uploader.filestore.cloud`. If Nectar or another openstack compliant cloud service is used, then the `clouds.yaml` should normally use `openstack`. The name is found under `clouds` in the yaml file.
 ```yaml
@@ -92,6 +93,15 @@ clouds:
 The `uploader.filestore.local` specifies the local directory where new files are to be detected and uploaded. Note that the uploader is only interested in _new_ files. However, touching the files can force the uploader to consider them as new files.
 
 The `uploader.filestore.cloud.container` specifies the container name in the object store where the files are uploaded. If the container does not exist, the uploader will create it.
+
+```yaml
+# exclude files with suffixes and prefixes
+uploader.ignore.suffix:
+  - .active
+uploader.ignore.prefix:
+  - '~'
+```
+The two yaml keys, `uploader.ignore.suffix` and `uploader.ignore.prefix`, specify a list of suffixes and prefixes of filenames that will be ignored. To define more than one suffix or prefix, add more lines under the key as a list. 
 
 ```yaml
 uploader.web.host: 0.0.0.0

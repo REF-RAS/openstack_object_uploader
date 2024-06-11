@@ -4,18 +4,22 @@
 uploader.mode: web # web or headless
 # cloud name, as appeared in the clouds.yaml file
 uploader.filestore.cloud: openstack
-# filestore path
-uploader.filestore.local: /home/qcr/Insync/Bagfiles
-uploader.filestore.cloud.container: Shorts Bagfiles
+# the local filestore path where new or modified files are uploaded
+uploader.filestore.local: /home/qcr/Bagfiles
+# the target object store container, the uploader will attempt to create if it not already exists
+uploader.filestore.cloud.container: Shorts Bagfiles      
+# exclude files with suffixes and prefixes
+uploader.ignore.suffix:
+  - .active
+uploader.ignore.prefix:
+  - '~'
 # Upload delay
 uploader.delay: 30 # seconds
 uploader.error_count.max: 5 
 # Dash Agent (uploader) setting
 uploader.web.host: 0.0.0.0
 uploader.web.port: 8071
-# uploader.web.debug.mode: False
 uploader.web.launch_browser: False
-uploader.web.auth: True   # Authentication required if web mode
 # Main system timers for the uploader implemented by Dash
 uploader.system.timer: 1  # seconds
 uploader.console.refresh: 5  # seconds

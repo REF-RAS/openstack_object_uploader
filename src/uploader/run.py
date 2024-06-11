@@ -34,6 +34,25 @@ class CustomFileSystemEventHandler(FileSystemEventHandler):
         super(CustomFileSystemEventHandler, self,).__init__()
         self.filestore_path = filestore_path
         self.uploader_delay = CONFIG.get('uploader.delay', 30)
+        # setup ignore list
+        self.ignore_suffix = CONFIG.get('uploader.ignore.suffix', None)
+        if self.ignore_suffix is not None and type(self.ignore_suffix) == str:
+            self.ignore_suffix = [self.ignore_suffix]
+        self.ignore_prefix = CONFIG.get('uploader.ignore.prefix', None)
+        if self.ignore_prefix is not None and type(self.ignore_prefix) == str:
+            self.ignore_prefix = [self.ignore_prefix]  
+
+    def is_in_ignore_lists(self, filename:str) -> bool:
+        if self.ignore_suffix is not None and type(self.ignore_suffix) in (tuple, list):
+            for prefix in self.ignore_suffix:
+                if filename.endswith(prefix):
+                    return True
+        if self.ignore_prefix is not None and type(self.ignore_prefix) in (tuple, list):
+            for prefix in self.ignore_prefix:
+                if filename.startswith(prefix):
+                    return True        
+        return False
+
     # The callback function when a create event occurs
     def on_created(self, event:FileSystemEvent):
         pass
@@ -43,10 +62,18 @@ class CustomFileSystemEventHandler(FileSystemEventHandler):
             # if the event is from a modified file
             local_path = event.src_path
             filename = file_tools.get_filename(local_path)
+            if self.is_in_ignore_lists(filename):
+                return
             parent_path = file_tools.get_parent(local_path)
             sub_path = parent_path[len(self.filestore_path) + 1:]  # the sub_path cannot start with '/' for os.path.join to work
             remote_filename = os.path.join(sub_path, filename)
             DAO.add_upload_file(local_path, filename, remote_filename, int(time.time()) + CONFIG.get('uploader.delay', self.uploader_delay))
+    # the callback function when a file is deleted
+    def on_deleted(self, event:FileSystemEvent):
+        if not event.is_directory:
+            # if the event is from a file
+            local_path = event.src_path
+            DAO.remove_upload_file(local_path)
 
 class OpenstackObjectUploader(object):
     def __init__(self):
@@ -63,6 +90,7 @@ class OpenstackObjectUploader(object):
         try:
             self.cloud = openstack.connect(cloud=self.cloud_name)
         except openstack.exceptions.ConfigException as e:
+            self.cloud = None
             logger.error(f'{type(self).__name__}: The application is unable to locate the application credential file "clouds.yaml".')
             logger.warning(f'{type(self).__name__}: Ensure that a clouds.yaml file is obtained from the openstack cloud provider.')
             logger.warning(f'{type(self).__name__}: If you have a valid clouds.yaml file, make sure it is in the current directory or ~/.config/openstack and only one cloud.yaml file.')
@@ -93,14 +121,15 @@ class OpenstackObjectUploader(object):
             sys.exit(1)   
         # attempt to make a connection to the container
         try:
-            self.container = self.cloud.object_store.create_container(self.filestore_container, is_content_type_detected=True)
-            logger.info(f'{type(self).__name__}: Connected to (and if needed created) the container "{self.filestore_container}"')
+            if self.cloud is not None:
+                self.container = self.cloud.object_store.create_container(self.filestore_container, is_content_type_detected=True)
+                logger.info(f'{type(self).__name__}: Connected to (and if needed created) the container "{self.filestore_container}"')
         except keystoneauth1.exceptions.http.Unauthorized as e:
             logger.error(f'{type(self).__name__}: The application is unable to authenticate using the credentials in "clouds.yaml".')
             logger.warning(f'{type(self).__name__}: Ensure that the file is current and valid to the cloud server.')
             logger.warning(f'{type(self).__name__}: The access right should include granting access to an object store.')
             logger.warning(f'{type(self).__name__}: Terminate the application and fix the problem according to the README.md file.')
-            sys.exit(1)
+            sys.exit(1)          
 
         # start the watchdog 
         self.watchdog_thread = self.run_watchdog(self.filestore_local)
@@ -174,7 +203,6 @@ class OpenstackObjectUploader(object):
             if len(next_to_upload) == 0:
                 continue
             # starts the uploading procedure
-            model.STATE.update(model.SystemStates.UPLOADING)
             # compute the parameters for uploading including the local and remote path
             model.STATE.set_var('upload', next_to_upload[0])
             local_path = next_to_upload[0]['local_path']
@@ -182,6 +210,7 @@ class OpenstackObjectUploader(object):
             file_size = (os.stat(local_path).st_size)
             start_time = time.time()
             logger.info(f'{type(self).__name__} (run_uploader): Uploading file {local_path} to {remote_path}')
+            model.STATE.update(model.SystemStates.UPLOADING)
             try: 
                 self.cloud.object_store.upload_object(container=self.container, name=remote_path, filename=local_path)
                 # compute the upload time
