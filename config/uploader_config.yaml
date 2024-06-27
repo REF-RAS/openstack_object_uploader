@@ -5,7 +5,7 @@ uploader.mode: web # web or headless
 # cloud name, as appeared in the clouds.yaml file
 uploader.filestore.cloud: openstack
 # the local filestore path where new or modified files are uploaded
-uploader.filestore.local: /home/qcr/project_ws/src/data
+uploader.filestore.local: /home/qcr/project_ws/src/data/bagfiles
 # the target object store container, the uploader will attempt to create if it not already exists
 uploader.filestore.cloud.container: Shorts Bagfiles      
 # exclude files with suffixes and prefixes
