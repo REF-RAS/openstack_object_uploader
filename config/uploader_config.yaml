@@ -7,7 +7,7 @@ uploader.filestore.cloud: openstack
 # the local filestore path where new or modified files are uploaded
 uploader.filestore.local: /home/qcr/project_ws/src/data/bagfiles
 # the target object store container, the uploader will attempt to create if it not already exists
-uploader.filestore.cloud.container: ARMHub-Test      
+uploader.filestore.cloud.container: Onsite Data      
 # exclude files with suffixes and prefixes
 uploader.ignore.suffix:
   - .active
