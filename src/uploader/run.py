@@ -14,14 +14,11 @@ __status__ = 'Development'
 # import libraries
 import sys, os, signal, time, threading, webbrowser, subprocess, traceback
 from datetime import datetime
-# ros modules
-import rospy, rosnode
 # project modules
 from tools.yaml_tools import YamlConfig
-from tools.logging_tools import logger
 import tools.file_tools as file_tools
 import uploader.model as model
-from uploader.model import DAO, CONFIG, STATE
+from uploader.model import DAO, CONFIG, STATE, logger
 from uploader.web.dashapp_top import DashAppTop
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler, FileSystemEventHandler, FileSystemEvent
@@ -98,15 +95,13 @@ class OpenstackObjectUploader(object):
             sys.exit(1)
 
         # prepare operation mode
-        self.operation_mode = rospy.get_param('mode', None)
-        if self.operation_mode is None or self.operation_mode == "":
-            self.operation_mode = CONFIG.get('uploader.mode', 'web')
+        self.operation_mode = CONFIG.get('uploader.mode', 'web')
         # create lock for synchronization
         self.state_lock = threading.Lock()
         self.log_lock = threading.Lock()
         # create the stop signal handler
         signal.signal(signal.SIGINT, self.stop)
-        rospy.on_shutdown(self.cb_shutdown)
+
         # setup watchdog
         self.filestore_local = CONFIG.get('uploader.filestore.local', None)
         self.filestore_container = CONFIG.get('uploader.filestore.cloud.container', None)
@@ -162,14 +157,11 @@ class OpenstackObjectUploader(object):
 
     # callback when interrupt signal is received
     def stop(self, *args, **kwargs):
-        logger.info(f'{type(self).__name__}: The ros node is being stopped')
+        logger.info(f'{type(self).__name__}: The application is being stopped')
         self.watchdog_thread.stop()
         self.uploader_thread_stop()
         sys.exit(0)
 
-    # callback when the ros receives a shutdown signal
-    def cb_shutdown(self):
-        logger.info(f'{type(self).__name__}: The ros node is being shutdown')
 
     # callback from the GUI console
     def _console_callback(self, event, *args):
@@ -236,7 +228,6 @@ class OpenstackObjectUploader(object):
 # The main program for running the application
 if __name__ == '__main__':
     NODE_NAME = 'openstack_object_uploader'
-    rospy.init_node(NODE_NAME)
     the_agent = OpenstackObjectUploader()
     DASH_HOST = CONFIG.get('uploader.web.host')
     DASH_PORT = CONFIG.get('uploader.web.host')

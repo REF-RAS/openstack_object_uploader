@@ -20,10 +20,8 @@ import dash_bootstrap_components as dbc
 # project modules
 from dash.exceptions import PreventUpdate
 from tools import type_tools
-from tools.logging_tools import logger
 from uploader.model import DAO, CONFIG
 import uploader.model as model
-import rospy, rostopic
 
 dash.register_page(__name__)
 
@@ -48,7 +46,7 @@ class ConsolePage():
             dbc.Row(html.P(id='console_system_status_message', style={'text-align':'left', 'font-family':'monospace'}), className='mx-auto col-8'),
             ], className='col-10 mx-auto text-center border mt-2', style={'height': 140,})        
 
-        # -- datatable for displaying rostopics status
+        # -- datatable for displaying upload stat
         self._upload_stat_datatable = dash_table.DataTable(id='console_upload_stat_table')
 
         self._upload_stat_panel = html.Div([
@@ -63,7 +61,7 @@ class ConsolePage():
             dbc.Row([self._diskspace_datatable], className='mx-auto col-12'),
             ], className='col-6 mx-auto text-center border mt-3')
 
-        # -- datatable for displaying rostopics status 
+        # -- datatable for displaying the queue status
         self._upload_queue_datatable = dash_table.DataTable(id='console_upload_queue_table')
 
         self._upload_queue_panel = html.Div([

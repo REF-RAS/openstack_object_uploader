@@ -7,7 +7,7 @@ uploader.filestore.cloud: openstack
 # the local filestore path where new or modified files are uploaded
 uploader.filestore.local: /home/qcr/Bagfiles
 # the target object store container, the uploader will attempt to create if it not already exists
-uploader.filestore.cloud.container: Shorts Bagfiles      
+uploader.filestore.cloud.container: sugarcane2  
 # exclude files with suffixes and prefixes
 uploader.ignore.suffix:
   - .active
@@ -20,6 +20,9 @@ uploader.error_count.max: 5
 uploader.web.host: 0.0.0.0
 uploader.web.port: 8071
 uploader.web.launch_browser: False
+# web_ssl_cert is defined to be an array of two values, which are path to the crt file and the path to the key file
+# if web_ssl_cert is defined, the web server is published as https server
+web_ssl_cert: null
 # Main system timers for the uploader implemented by Dash
 uploader.system.timer: 1  # seconds
 uploader.console.refresh: 5  # seconds

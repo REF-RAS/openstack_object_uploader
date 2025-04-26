@@ -13,21 +13,18 @@ __status__ = 'Development'
 # gunicorn graph:app.server -b :8000
 
 # import libraries
-import sys, os, signal, io, time, traceback
+import sys, os, signal, io, time, traceback, logging
 import dash
 import dash_bootstrap_components as dbc
 from dash import html, dcc
 from dash_auth import BasicAuth
 from dash.dependencies import Input, Output, State
 from flask import Flask
-# ros modules
-import rospy, message_filters
 # project modules
 from tools.yaml_tools import YamlConfig
-from tools.logging_tools import logger
 import tools.hash_tools as hash_tools
 import uploader.model as model
-from uploader.model import CONFIG, DAO
+from uploader.model import CONFIG, DAO, logger
 
 SERVER = Flask(__name__)
 APP = dash.Dash(__name__, 
@@ -92,11 +89,20 @@ class DashAppTop():
               [State('url', 'pathname')])(self._dash_system_timer())
                
     def start(self):
-        rospy.loginfo(f'{_APP_NAME}: starting the dash flask server')
-        self.app.run_server(host=self.DASH_HOST, port=self.DASH_PORT, debug=CONFIG.get('uploader.web.debug.mode', False))
+        logging.getLogger('werkzeug').setLevel(logging.ERROR)
+        context = CONFIG.get('web_ssl_cert', None)
+        # start the server
+        if context is not None and type(context) in (list, tuple) and len(context) >= 2 and \
+                os.path.isfile(context[0]) and os.path.isfile(context[1]):
+            logger.info(f'{_APP_NAME}: starting the flask server at https://{self.DASH_HOST}:{self.DASH_PORT}')
+            self.app.run(host=self.DASH_HOST, port=self.DASH_PORT, debug=CONFIG.get('uploader.web.debug.mode', False), ssl_context=tuple(context))
+
+        else:
+            self.app.run(host=self.DASH_HOST, port=self.DASH_PORT, debug=CONFIG.get('uploader.web.debug.mode', False))
+            logger.info(f'{_APP_NAME}: starting the flask server at http://{self.DASH_HOST}:{self.DASH_PORT}')
 
     def stop(self, *args, **kwargs):
-        rospy.loginfo(f'{_APP_NAME}: the dash flask server is being shutdown')
+        logger.info(f'{_APP_NAME}: the flask server is being shutdown')
         time.sleep(2)
         sys.exit(0)
 

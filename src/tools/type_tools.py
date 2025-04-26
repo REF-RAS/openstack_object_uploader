@@ -13,8 +13,6 @@ __status__ = 'Development'
 from datetime import datetime, date, time, timedelta
 import pandas as pd
 import numpy as np 
-from tools.logging_tools import logger
-
 
 def timestamp_to_datestr(x:float) -> str:
     """ Return the date string representation 2024-May-01 00:00:00 from a timestamp

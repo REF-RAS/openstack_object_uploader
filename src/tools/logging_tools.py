@@ -41,16 +41,20 @@ class CustomFormatter(logging.Formatter):
         return repr(result)
 
 # Internal function that intializes the logger
-def init_logger():
-    logger = logging.getLogger('main')
-    logger.setLevel(logging.INFO)
+def get_logger(name='global', level=logging.INFO, silent:bool=False, logging_file=None, logging_file_level=None):
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
     logger.propagate = False
     if not logger.handlers:
-        ch = logging.StreamHandler()
-        ch.setFormatter(CustomFormatter())
-        logger.addHandler(ch)
+        if not silent or logging_file is None:
+            ch = logging.StreamHandler()
+            ch.setFormatter(CustomFormatter())
+            ch.setLevel(level)
+            logger.addHandler(ch)
+        if logging_file:
+            logging_file_level = level if logging_file_level is None else logging_file_level
+            fh = logging.FileHandler(logging_file)
+            fh.setLevel(logging_file_level)
+            logger.addHandler(fh)
     return logger
-
-# The global object to be imported by other modules
-logger = init_logger()
 

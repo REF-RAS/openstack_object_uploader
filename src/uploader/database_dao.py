@@ -11,7 +11,7 @@ __email__ = 'ak.lui@qut.edu.au'
 __status__ = 'Development'
 
 # ----- the common modules
-import os, json, random, copy, glob, collections, sys, time, datetime, shutil
+import os, json, random, copy, glob, collections, sys, time, datetime, shutil, logging
 from enum import Enum
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from datetime import datetime as dt
@@ -20,7 +20,9 @@ import uploader.database_setup as database_setup
 import tools.db_tools as db_tools
 import tools.file_tools as file_tools
 from tools.lock_tools import synchronized
-from tools.logging_tools import logger
+from tools.logging_tools import get_logger
+
+logger = get_logger('database', level=logging.INFO)
 
 # This class models the management and backup of db files and the folder that contains the files
 class DBFileManager():

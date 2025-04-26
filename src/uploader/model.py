@@ -10,13 +10,13 @@ __email__ = 'ak.lui@qut.edu.au'
 __status__ = 'Development'
 
 # general modules
-import os
+import os, logging
 from enum import Enum
 # project modules
 import uploader.model_base as model_base
 from uploader.database_dao import DBFileManager, UploaderDAO
 from tools.yaml_tools import YamlConfig
-from tools.logging_tools import logger
+from tools.logging_tools import get_logger
 
 class CallbackTypes(Enum):
     TIMER = 0
@@ -27,6 +27,10 @@ class SystemStates(Enum):
     UPLOADING = 1
     ERROR = -1
 
+# set logging level of the dash flask server
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
+# global logger
+logger = get_logger(name='openstack_uploader', level=logging.INFO)
 # The global variables to be imported by other modules
 CALLBACK_MANAGER = model_base.CallbackManager()
 CONFIG:YamlConfig = YamlConfig(os.path.join(os.path.dirname(__file__), '../../config/uploader_config.yaml'))

@@ -18,7 +18,6 @@ import dash_bootstrap_components as dbc
 from dash.exceptions import PreventUpdate 
 # project modules
 from tools import db_tools, type_tools
-from tools.logging_tools import logger
 from uploader.model import DAO
 
 dash.register_page(__name__)

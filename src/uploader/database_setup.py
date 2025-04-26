@@ -11,10 +11,12 @@ __version__ = '1.0'
 __email__ = 'ak.lui@qut.edu.au'
 __status__ = 'Development'
 
-import os, json, random, copy, glob, collections, sys, yaml
+import os, json, random, copy, glob, collections, sys, yaml, logging
 import tools.db_tools as db_tools
 import tools.file_tools as file_tools
-from tools.logging_tools import logger
+from tools.logging_tools import get_logger
+
+logger = get_logger('database', level=logging.INFO)
 
 # The scripts for creating tables for the database
 CREATE_TABLES_SQL = [""" 

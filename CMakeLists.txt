@@ -10,10 +10,10 @@ project(openstack_object_uploader)
 find_package(PythonLibs REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
-  rospy
-  std_msgs
-  std_srvs
-  message_generation
+#  rospy
+#  std_msgs
+#  std_srvs
+#  message_generation
 )
 
 find_package(catkin REQUIRED COMPONENTS roslaunch)

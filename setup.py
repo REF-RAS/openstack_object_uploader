@@ -3,14 +3,13 @@ from catkin_pkg.python_setup import generate_distutils_setup
 
 # required packages
 req_packages = [
-#    'pyrealsense2>=2.5.0',
 ]
 
 # fetch values from package.xml
 setup_args = generate_distutils_setup(
     packages=['uploader', 'tools'],
     package_dir={'': 'src'},
-    python_requires='>=3.9',
+    python_requires='>=3.8',
     install_requires=req_packages
 )
 
